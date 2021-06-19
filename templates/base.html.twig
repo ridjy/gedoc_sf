@@ -57,10 +57,55 @@
                         </nav>
                     </div>
                 </div>
+                <!--fin div colmd2-->
                 </div>
+                <!--fin row-->
             </div>
+            <!--fin container-->
         </div>
-        {% block body %}{% endblock %}
+        <!--fin header-->
+
+        <div class="page-content">
+            <div class="row">
+                <!--debut menu-->
+                <div class="col-md-2">
+                    <div class="sidebar content-box" style="display: block;">
+                        <ul class="nav">
+                            <!-- Main menu -->
+                            <li {% if nav=='dashboard' %} class="current" {% endif %}>
+                                <a href="{{ path('document') }}"><i class="glyphicon glyphicon-home"></i> Tableau de bord</a>
+                            </li>
+                            <li {% if nav=='users' %} class="current" {% endif %}>
+                                <a href="{{ path('document') }}"><i class="glyphicon glyphicon-user"></i> Utilisateurs</a>
+                            </li>
+                            <li {% if nav=='liste_doc' %} class="current" {% endif %}>
+                                <a href="{{ path('document') }}"><i class="glyphicon glyphicon-list"></i> Documents</a>
+                            </li>
+                            <li class="submenu {% if nav=='categorie' or nav=='motcle' %} current {% endif %}">
+                                <a href="#">
+                                    <i class="glyphicon glyphicon-tags"></i> Categories et mots clés
+                                    <span class="caret pull-right"></span>
+                                </a>
+                                <!-- Sub menu -->
+                                <ul>
+                                    <li><a href="{{ path('document') }}">Categories</a></li>
+                                    <li><a href="{{ path('document') }}">Mots clés</a></li>
+                                </ul>
+                            </li>
+                            <li {% if nav=='notification' %} class="current" {% endif %}>
+                                <a href="{{ path('document') }}"><i class="glyphicon glyphicon-envelope"></i> Notifications</a>
+                            </li>
+                            
+                        </ul>
+                    </div><!--fin sidebar-->
+                </div>
+                <!--fin col 2 menu-->
+                <div class="col-md-10">
+                    {% block body %}{% endblock %}
+                </div>
+            </div><!--fin row-->    
+        </div>
+        <!--fin page content-->
 
         <footer>
          <div class="container">
