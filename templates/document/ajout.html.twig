@@ -1,0 +1,57 @@
+<div class="panel panel-success">
+
+    <div class="panel-body">
+        <form id="ajoutdoc" method="POST" action="#" enctype="multipart/form-data">
+            <div class="form-group row">
+                <label class="col-md-3 control-label" for="date_publication">Date de publication:</label>
+                <div class="col-md-5">
+                    <input class="form-control" name="date_publication" type="date" class="form-control">
+                </div>
+            </div><!--fin div date publication-->
+
+            <div class="form-group row">
+                <label for="titre" class="col-md-3 control-label">Titre document:</label>
+                <div class="col-sm-9">
+                    <input name="titre" type="text" class="form-control">
+                </div>          
+            </div><!--fin titre doc-->
+
+            <div class="form-group row">
+                <label for="date_creation" class="col-md-3 control-label">Date de création:</label>
+                <div class="col-sm-5">
+                    <input name="date_creation" readonly="" class="form-control" value='{{"now"|date("d/m/Y H:i:s")}}'>
+                </div>          
+            </div><!--fin date creation-->
+                  
+            <div class="form-group row">
+                <label for="categorie" class="col-sm-3 col-form-label">Catégorie(s):</label>
+                <div class="col-sm-10">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="mot_cle" class="col-sm-3 col-form-label">Mot(s) clé(s):</label>
+                <div class="col-sm-10">
+                </div>    
+            </div><!--fin mc-->
+                  
+            <div class="form-group row">
+                <label for="description" class="col-sm-3 col-form-label">Description:</label>
+                <div class="col-sm-9">
+                    <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+               </div>
+            </div>
+            <!--fin description-->      
+
+            <div class="form-group row">
+                <label for="fichier" class="col-sm-3 col-form-label">Veuillez insérer le fichier</label>
+                <div class="col-sm-9">
+                    <input type="file" name="avatar" required="">
+                </div>
+            </div>
+        </form>
+
+    </div><!--fin panelbody-->
+</div><!--fin panel success-->
+
+

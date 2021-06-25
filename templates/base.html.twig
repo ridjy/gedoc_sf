@@ -17,6 +17,7 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
             <![endif]-->
+            {% block css %}{% endblock %}    
         {% endblock %}
         
     </head>
@@ -79,7 +80,7 @@
                                 <a href="{{ path('document') }}"><i class="glyphicon glyphicon-user"></i> Utilisateurs</a>
                             </li>
                             <li {% if nav=='liste_doc' %} class="current" {% endif %}>
-                                <a href="{{ path('document') }}"><i class="glyphicon glyphicon-list"></i> Documents</a>
+                                <a href="{{ path('document_liste') }}"><i class="glyphicon glyphicon-list"></i> Documents</a>
                             </li>
                             <li class="submenu {% if nav=='categorie' or nav=='motcle' %} current {% endif %}">
                                 <a href="#">
@@ -122,6 +123,7 @@
             <!-- Include all compiled plugins (below), or include individual files as needed -->
             <script src="{{asset('bootstrap/js/bootstrap.min.js')}}"></script>
             <script src="{{asset('js/custom.js')}}"></script>
+            {% block jscript %}{% endblock %}
         {% endblock %}
     </body>
 </html>

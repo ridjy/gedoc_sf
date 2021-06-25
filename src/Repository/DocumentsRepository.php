@@ -19,32 +19,28 @@ class DocumentsRepository extends ServiceEntityRepository
         parent::__construct($registry, Documents::class);
     }
 
-    // /**
-    //  * @return Documents[] Returns an array of Documents objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    //get all categorie of the docs
+    public function findAllCategorieofDocs($n_idDoc)
     {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('d.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $s_sql = "SELECT c.cat_libelle FROM categories c INNER JOIN doc_categorie dc ON dc.cat_id=c.cat_id 
+        WHERE dc.doc_id={$n_idDoc}";
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($s_sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
+        return $results;
+    }//fin findall
 
-    /*
-    public function findOneBySomeField($value): ?Documents
+    //get all Keyword of the docs
+    public function findAllKeywordOfDocs($n_idDoc)
     {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+        $s_sql = "SELECT mc.mc_lib FROM motcles mc INNER JOIN doc_motcle dc USING(mc_id) 
+        WHERE dc.doc_id={$n_idDoc}";
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($s_sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
+        return $results;
+    }//fin findall
+
 }
