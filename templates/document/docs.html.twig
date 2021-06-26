@@ -40,7 +40,7 @@
 <script src="{{ asset('bundles/datatables/js/datatables.js') }}"></script>
 <!--modal jquery confirm-->
 <script type="text/javascript" src="{{asset('js/jquery-confirm/jquery-confirm.js')}}"></script>
-<script src="{{asset('js/query.dropdown.min.js')}}j"></script>
+<script src="{{asset('js/jquery.dropdown.min.js')}}"></script>
 <script>
     $(function() {
         table2 = $('#documents').initDataTables({{ datatable_settings(datatable) }} , {
@@ -99,8 +99,8 @@ function newDoc()
                 text: "Enregistrer",
                 btnClass: 'btn-blue',
                 action: function () {
+                    savedoc();
                     this.close();
-                    //ajax suppr filtre temp
                 }
             },
             fermer: {
@@ -114,6 +114,31 @@ function newDoc()
     });//fin confirm
 
 }//fin newdoc
+
+function savedoc()
+{
+    $.ajax({
+        type: 'POST',
+        url: '{{ path('save_doc') }}',
+        dataType: 'html',
+        data: new FormData($('#ajoutdoc')[0]),
+        dataType: 'json',
+        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+        processData: false, // NEEDED, DON'T OMIT THIS
+        success: function (response) {
+            $.alert({
+                title: response.msg,
+                type : response.type,
+                content: '',
+            });
+            table2.then(function(dt) {
+                // dt contains the initialized instance of DataTables
+                dt.ajax.reload();
+            });
+        }//fin success
+    });//fin ajax
+}//fin savedoc
+
 </script>
 {% endblock %}
 

@@ -19,8 +19,13 @@ use App\Entity\Users;
 use App\Entity\Documents;
 use App\Entity\Motcles;
 use App\Entity\Categories;
+use App\Entity\DocCategorie;
+use App\Entity\DocMotcle;
+use App\Entity\Notifications;
 //service
 use App\Service\DocService;
+//kernel
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class DocumentController extends AbstractController
 {
@@ -115,8 +120,8 @@ class DocumentController extends AbstractController
             $o_motcle = $this->getDoctrine()->getRepository(Motcles::class)->findAll();
             $o_categorie = $this->getDoctrine()->getRepository(Categories::class)->findAll();
             return $this->render('document/ajout.html.twig', [
-                'motcle' => $o_motcle,
-                'categorie' => $o_categorie
+                'motcles' => $o_motcle,
+                'categories' => $o_categorie
             ]);
         }
     }//fin ajoutdoc
@@ -124,16 +129,92 @@ class DocumentController extends AbstractController
     /**
      * @Route("/docs/ajout/enreg", name="save_doc")
      */
-    public function enregDocs(SessionInterface $session, Request $Request)
+    public function enregDocs(SessionInterface $session, Request $Request, KernelInterface $kernel)
     {
         //on n'affiche rien si ce n'est pas un appel ajax
         if ($Request->isXmlHttpRequest()) 
         {
-            
-            return $this->render('document/ajout.html.twig', [
-                'appel' => 'edd'
-            ]);
-        }
+            $d_datepublication = $Request->request->get('date_publication');
+            $s_titre = $Request->request->get('titre');
+            $d_datecreation =  $Request->request->get('date_creation');
+            $a_cat = $Request->request->get('categories');
+            $a_mc = $Request->request->get('motcles');
+            $s_desc = $Request->request->get('description');
+            $o_file = $Request->files->get('document');//['']
+            //test si un fichier est ajouté
+            if($o_file!=null)
+		    { 
+                $fichier = $o_file->getClientOriginalName();//$o_file->getBasename();
+                $dossier = $kernel->getProjectDir() . "\public\upload\\$fichier";
+                $entityManager = $this->getDoctrine()->getManager();
+                if(move_uploaded_file($o_file->getPathname(), $dossier)) //Si la fonction renvoie TRUE, c'est que ça a fonctionné...
+		        {
+                    //creation des objets à mettre en base
+                    $o_doc = new Documents();
+                    //document
+                    $o_doc->setDocName($fichier);
+                    $o_doc->setCatId(0);
+                    $o_doc->setDocDateCreation($d_datecreation);
+                    $o_doc->setDocDateModif($d_datecreation);
+                    $o_doc->setDocDescription($s_desc);
+                    $o_doc->setDocEmplacement($dossier);
+                    $o_doc->setDocTaille(filesize($dossier));
+                    $o_doc->setUserId( $session->get('user_connecte')->getusersId() ) ;
+                    $o_doc->setDocTitre($s_titre);
+                    $o_doc->setDocDatePublication($d_datepublication);
+                    $entityManager->persist($o_doc);
+                    $entityManager->flush();
+                    $n_docid = $o_doc->getDocId();
+                    //document categorie
+                    foreach ($a_cat as $cat)
+                    {
+                        $o_docCateg = new DocCategorie();
+                        $o_docCateg->setDocId($n_docid);
+                        $o_docCateg->setCatId($cat);
+                        $o_docCateg->setDateAjout($d_datecreation);
+                        $entityManager->persist($o_docCateg);
+                        $entityManager->flush();
+                    }//fin foreach
+                    
+                    //document motcle
+                    foreach ($a_mc as $mc)
+                    {
+                        $o_docmc = new DocMotcle();
+                        $o_docmc->setDocId($n_docid);
+                        $o_docmc->setMcId($mc);
+                        $o_docmc->setDateAjout($d_datecreation);
+                        $entityManager->persist($o_docmc);
+                        $entityManager->flush();
+                    }//fin foreach
+                
+                    //ajout notification
+                    $o_notif = new Notifications();
+                    $o_notif->setDateNotif($d_datecreation);
+                    $o_notif->setContenu('upload du document '.$fichier);
+                    $o_notif->setLu(0);
+                    $entityManager->persist($o_notif);
+                    $entityManager->flush();
+                    
+                    //formattage msg retour
+                    $result = array('msg' => 'Document enregistré', 'type'=>'green');
+		        }//end move uploaded file
+		        else //Sinon (la fonction renvoie FALSE).
+		        {
+		            $result = array('msg' => 'Echec de l\'upload !', 'type'=>'red');
+		        }//end else upload file
+		    }//end if o_file
+		    else{
+			    //erreur sur pas de fichier
+			    $result = array('msg' => 'Veuillez insérer un fichier', 'type'=>'red');
+		    }//endelse
+
+            $response = json_encode($result);
+            $returnResponse = new JsonResponse();
+            $returnResponse->setJson($response);
+
+            return $returnResponse;
+        
+        }//fin xmlhttprequest
     }//fin ajoutdoc
 
 }//fin doc controler

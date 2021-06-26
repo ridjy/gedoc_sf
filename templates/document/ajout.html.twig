@@ -5,33 +5,43 @@
             <div class="form-group row">
                 <label class="col-md-3 control-label" for="date_publication">Date de publication:</label>
                 <div class="col-md-5">
-                    <input class="form-control" name="date_publication" type="date" class="form-control">
+                    <input class="form-control" id="date_publication" name="date_publication" type="date" class="form-control">
                 </div>
             </div><!--fin div date publication-->
 
             <div class="form-group row">
                 <label for="titre" class="col-md-3 control-label">Titre document:</label>
                 <div class="col-sm-9">
-                    <input name="titre" type="text" class="form-control">
+                    <input name="titre" id="titre_doc" type="text" class="form-control">
                 </div>          
             </div><!--fin titre doc-->
 
             <div class="form-group row">
                 <label for="date_creation" class="col-md-3 control-label">Date de création:</label>
                 <div class="col-sm-5">
-                    <input name="date_creation" readonly="" class="form-control" value='{{"now"|date("d/m/Y H:i:s")}}'>
+                    <input name="date_creation" id="date_creation" readonly="" class="form-control" value='{{"now"|date("d/m/Y H:i:s")}}'>
                 </div>          
             </div><!--fin date creation-->
                   
             <div class="form-group row">
                 <label for="categorie" class="col-sm-3 col-form-label">Catégorie(s):</label>
-                <div class="col-sm-10">
+                <div class="col-sm-12" id="selcateg">
+                    <select style="display:none" id="cats" name="categories[]" multiple>
+                        {% for var in categories %}
+                            <option value="{{ var.getCatId }}" >{{ var.getCatLibelle }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="mot_cle" class="col-sm-3 col-form-label">Mot(s) clé(s):</label>
-                <div class="col-sm-10">
+                <div class="col-sm-12" id="selmc">
+                    <select style="display:none" id="mcs" name="motcles[]" multiple>
+                        {% for var in motcles %}
+                            <option value="{{ var.getMcId }}" >{{ var.getMcLib }}</option>
+                        {% endfor %}
+                    </select>
                 </div>    
             </div><!--fin mc-->
                   
@@ -44,14 +54,28 @@
             <!--fin description-->      
 
             <div class="form-group row">
-                <label for="fichier" class="col-sm-3 col-form-label">Veuillez insérer le fichier</label>
-                <div class="col-sm-9">
-                    <input type="file" name="avatar" required="">
+                <label for="fichier" class="col-sm-4 col-form-label">Veuillez insérer le fichier</label>
+                <br/>
+                <div class="col-sm-10">
+                    <input type="file" name="document" required="">
                 </div>
             </div>
         </form>
 
     </div><!--fin panelbody-->
 </div><!--fin panel success-->
+
+<script>
+$('#selmc').dropdown({
+    input: '<input type="text" maxLength="20" placeholder="Recherche rapide">',
+    data: [],
+    searchable: true
+});
+$('#selcateg').dropdown({
+    input: '<input type="text" maxLength="20" placeholder="Recherche rapide">',
+    data: [],
+    searchable: true
+});
+</script>
 
 
