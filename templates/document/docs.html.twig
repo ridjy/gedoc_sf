@@ -75,7 +75,7 @@ function newDoc()
     popupnewDoc = $.confirm({
         title: "Déposer un document sur le serveur",
         closeIcon: true,
-        type: 'greenpurple',
+        type: 'purple',
         columnClass: 'l',
         content: function () {
             var self = this;
@@ -139,6 +139,52 @@ function savedoc()
     });//fin ajax
 }//fin savedoc
 
+//
+function editDoc(idDoc)
+{
+    //creation du popup filtre
+    popupeditDoc = $.confirm({
+        title: "Détails du document",
+        closeIcon: true,
+        type: 'purple',
+        columnClass: 'l',
+        content: function () {
+            var self = this;
+            return $.ajax({
+                url: "{{ path('edit_doc') }}",
+                data: {id : idDoc},
+                dataType: 'html',
+                type: 'POST'
+            }).done(function (response) {
+                self.setContent(response);
+            }).fail(function(error){
+                if(error.status == 440) // redirect to accueil (deconnect
+                {
+                    //redirectDeconnect();
+                } 
+                self.close();
+            });
+        },
+        buttons: {
+            Appliquer: {
+                text: "Mettre à jour",
+                btnClass: 'btn-blue',
+                action: function () {
+                    //savedoc();
+                    this.close();
+                }
+            },
+            fermer: {
+                text: "Fermer",
+                btnClass: 'btn-blue',
+                action: function () {
+                    this.close();
+                }
+            }
+        }//fin button
+    });//fin confirm
+
+}//fin newdoc
 </script>
 {% endblock %}
 

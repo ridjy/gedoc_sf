@@ -217,4 +217,35 @@ class DocumentController extends AbstractController
         }//fin xmlhttprequest
     }//fin ajoutdoc
 
+    /**
+     * @Route("/docs/edit", name="edit_doc")
+     */
+    public function modifierDocs(SessionInterface $session, Request $Request)
+    {
+        //on n'affiche rien si ce n'est pas un appel ajax
+        if ($Request->isXmlHttpRequest()) 
+        {
+            $n_idDoc = $Request->request->get('id');
+            $a_allMC = $this->getDoctrine()->getRepository(Documents::class)->findAllKeywordOfDocs($n_idDoc);
+            $a_allCategorie = $this->getDoctrine()->getRepository(Documents::class)->findAllCategorieofDocs($n_idDoc);
+            $o_doc = $this->getDoctrine()->getRepository(Documents::class)->find($n_idDoc);
+            $o_motcle = $this->getDoctrine()->getRepository(Motcles::class)->findAll();
+            $o_categorie = $this->getDoctrine()->getRepository(Categories::class)->findAll();
+            $a_catDoc = array(); $a_mcDoc = array();
+            foreach ($a_allCategorie as $categorie) {
+                $a_catDoc[] = $categorie['cat_libelle'] ;
+            }
+            foreach ($a_allMC as $mc) {
+                $a_mcDoc[] = $mc['mc_lib'];
+            }
+            return $this->render('document/edit.html.twig', [
+                'motclesDoc' => $a_mcDoc,
+                'categoriesDoc' => $a_catDoc,
+                'motcles' => $o_motcle,
+                'categories' => $o_categorie,
+                'doc' => $o_doc
+            ]);
+        }//fin if
+    }//fin modifierDocs
+
 }//fin doc controler
