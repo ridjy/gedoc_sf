@@ -43,4 +43,25 @@ class DocumentsRepository extends ServiceEntityRepository
         return $results;
     }//fin findall
 
-}
+    //delete all Keyword of the docs
+    public function deleteAllKeywordOfDocs($n_idDoc)
+    {
+        $s_sql = "DELETE FROM doc_motcle WHERE doc_id={$n_idDoc}";
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($s_sql);
+        $stmt->execute();
+        return true;
+    }//fin findall
+
+    //get all categorie of the docs
+    public function deleteAllCategorieofDocs($n_idDoc)
+    {
+        $s_sql = "DELETE FROM doc_categorie WHERE doc_id={$n_idDoc}";
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($s_sql);
+        $stmt->execute();
+        return true;
+    }//fin findall
+
+
+}//fin

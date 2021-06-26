@@ -248,4 +248,73 @@ class DocumentController extends AbstractController
         }//fin if
     }//fin modifierDocs
 
+    /**
+     * @Route("/docs/edit/enreg", name="save_edit_doc")
+     */
+    public function editenregDocs(SessionInterface $session, Request $Request, KernelInterface $kernel)
+    {
+        //on n'affiche rien si ce n'est pas un appel ajax
+        if ($Request->isXmlHttpRequest()) 
+        {
+            $n_idDoc = $Request->request->get('id_doc');
+            $d_datepublication = $Request->request->get('date_publication');
+            $s_titre = $Request->request->get('titre');
+            $d_datecreation =  $Request->request->get('date_creation');
+            $a_cat = $Request->request->get('categories');
+            $a_mc = $Request->request->get('motcles');
+            $s_desc = $Request->request->get('description');
+            
+            $entityManager = $this->getDoctrine()->getManager();
+            $o_doc = $this->getDoctrine()->getRepository(Documents::class)->find($n_idDoc);
+            //document
+            $o_doc->setDocDateModif(date('d/m/Y H:i:s'));
+            $o_doc->setDocDescription($s_desc);
+            $o_doc->setDocTitre($s_titre);
+            $o_doc->setDocDatePublication($d_datepublication);
+            $entityManager->persist($o_doc);
+            $entityManager->flush();
+            //document categorie
+            $this->getDoctrine()->getRepository(Documents::class)->deleteAllCategorieofDocs($n_idDoc);
+            foreach ($a_cat as $cat)
+            {
+                $o_docCateg = new DocCategorie();
+                $o_docCateg->setDocId($n_idDoc);
+                $o_docCateg->setCatId($cat);
+                $o_docCateg->setDateAjout($d_datecreation);
+                $entityManager->persist($o_docCateg);
+                $entityManager->flush();
+            }//fin foreach
+            
+            $this->getDoctrine()->getRepository(Documents::class)->deleteAllKeywordOfDocs($n_idDoc);
+            //document motcle
+            foreach ($a_mc as $mc)
+            {
+                $o_docmc = new DocMotcle();
+                $o_docmc->setDocId($n_idDoc);
+                $o_docmc->setMcId($mc);
+                $o_docmc->setDateAjout($d_datecreation);
+                $entityManager->persist($o_docmc);
+                $entityManager->flush();
+            }//fin foreach
+        
+            //ajout notification
+            $o_notif = new Notifications();
+            $o_notif->setDateNotif($d_datecreation);
+            $o_notif->setContenu('Mise à jour du document '.$s_titre);
+            $o_notif->setLu(0);
+            $entityManager->persist($o_notif);
+            $entityManager->flush();
+            
+            //formattage msg retour
+            $result = array('msg' => 'Document mis à jour', 'type'=>'green');
+		    
+            $response = json_encode($result);
+            $returnResponse = new JsonResponse();
+            $returnResponse->setJson($response);
+
+            return $returnResponse;
+        
+        }//fin xmlhttprequest
+    }//fin ajoutdoc
+
 }//fin doc controler

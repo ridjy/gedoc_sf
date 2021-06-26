@@ -170,7 +170,7 @@ function editDoc(idDoc)
                 text: "Mettre à jour",
                 btnClass: 'btn-blue',
                 action: function () {
-                    //savedoc();
+                    saveeditdoc();
                     this.close();
                 }
             },
@@ -185,6 +185,32 @@ function editDoc(idDoc)
     });//fin confirm
 
 }//fin newdoc
+
+function saveeditdoc()
+{
+    $.ajax({
+        type: 'POST',
+        url: '{{ path('save_edit_doc') }}',
+        dataType: 'html',
+        data: new FormData($('#editdoc')[0]),
+        dataType: 'json',
+        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+        processData: false, // NEEDED, DON'T OMIT THIS
+        success: function (response) {
+            $.alert({
+                title: response.msg,
+                type : response.type,
+                content: '',
+            });
+            table2.then(function(dt) {
+                // dt contains the initialized instance of DataTables
+                dt.ajax.reload();
+            });
+        }//fin success
+    });//fin ajax
+}//fin savedoc
+
+
 </script>
 {% endblock %}
 
