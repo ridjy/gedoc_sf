@@ -60,7 +60,8 @@ class DocumentController extends AbstractController
                 'field' => 'doc.docId', 'label' => 'Action', 'orderable' => false,
                 'className' => 'text-center', 'render' => function ($value, $context) use ($session) {
                     $s_modif = '<span style="font-size: 20px;" class="glyphicon glyphicon-pencil" onClick="editDoc('.$value.');"></span>  ';
-                    $s_effacer = '<span style="font-size: 20px;" class="glyphicon glyphicon-trash" onClick="deleteDoc('.$value.');"></span>  ';
+                    $s_effacer = '<span style="font-size: 20px;" class="glyphicon glyphicon-trash" onClick="deleteDoc('.$value.',\''.
+                    str_replace("'","\'",$context->getdocTitre()).'\');"></span>  ';
                     $responseTemp = "<table><tr style='background-color:transparent'><td style='width :50%; padding: 5px' >".$s_modif .
                      "</td><td style='width :50%; padding: 5px'>" . $s_effacer . "</td></tr>";
                     return $responseTemp;
@@ -315,6 +316,46 @@ class DocumentController extends AbstractController
             return $returnResponse;
         
         }//fin xmlhttprequest
-    }//fin ajoutdoc
+    }//fin editenregdoc
+
+    /**
+     * @Route("/docs/delete/enreg", name="save_delete_doc")
+     */
+    public function deleteenregDocs(SessionInterface $session, Request $Request, KernelInterface $kernel)
+    {
+        //on n'affiche rien si ce n'est pas un appel ajax
+        if ($Request->isXmlHttpRequest()) 
+        {
+            $n_idDoc = $Request->request->get('ident');
+            $entityManager = $this->getDoctrine()->getManager();
+            $o_doc = $this->getDoctrine()->getRepository(Documents::class)->find($n_idDoc);
+            //document categorie
+            $this->getDoctrine()->getRepository(Documents::class)->deleteAllCategorieofDocs($n_idDoc);
+            $this->getDoctrine()->getRepository(Documents::class)->deleteAllKeywordOfDocs($n_idDoc);
+            
+            //document
+            $s_titre = $o_doc->getDocTitre();
+            $entityManager->remove($o_doc);
+            $entityManager->flush();
+            
+            //ajout notification
+            $o_notif = new Notifications();
+            $o_notif->setDateNotif(date('d/m/Y H:i:s'));
+            $o_notif->setContenu('Suppression du document '.$s_titre);
+            $o_notif->setLu(0);
+            $entityManager->persist($o_notif);
+            $entityManager->flush();
+            
+            //formattage msg retour
+            $result = array('msg' => 'suppression effectuée', 'type'=>'red');
+		    
+            $response = json_encode($result);
+            $returnResponse = new JsonResponse();
+            $returnResponse->setJson($response);
+
+            return $returnResponse;
+        
+        }//fin xmlhttprequest
+    }//fin editenregdoc
 
 }//fin doc controler

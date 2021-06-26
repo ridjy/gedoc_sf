@@ -210,6 +210,56 @@ function saveeditdoc()
     });//fin ajax
 }//fin savedoc
 
+function deleteDoc(idDoc,titre)
+{
+    //creation du popup filtre
+    popupdeleteDoc = $.confirm({
+        title: "Suppression du document",
+        closeIcon: true,
+        type: 'red',
+        columnClass: 'm',
+        content: "Etes-vous sûr de vouloir supprimer le document : <b>\""+titre+"\"</b> du serveur ? "
+        + "<br/> <b>Attention</b> cette action est irréversible",
+        buttons: {
+            Appliquer: {
+                text: "Oui, je suis sûr",
+                btnClass: 'btn-blue',
+                action: function () {
+                    savedeletedoc(idDoc);
+                    this.close();
+                }
+            },
+            fermer: {
+                text: "Abandonner",
+                btnClass: 'btn-blue',
+                action: function () {
+                    this.close();
+                }
+            }
+        }//fin button
+    });//fin confirm
+}//fin delete doc
+
+function savedeletedoc(idDoc)
+{
+    $.ajax({
+        type: 'POST',
+        url: '{{ path('save_delete_doc') }}',
+        data: { ident : idDoc },
+        dataType: 'json',
+        success: function (response) {
+            $.alert({
+                title: response.msg,
+                type : response.type,
+                content: '',
+            });
+            table2.then(function(dt) {
+                // dt contains the initialized instance of DataTables
+                dt.ajax.reload();
+            });
+        }//fin success
+    });//fin ajax
+}//fin savedeletedoc
 
 </script>
 {% endblock %}
