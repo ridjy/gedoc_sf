@@ -1,0 +1,263 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}STC | Gedoc{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.2.1/dt-1.10.16/datatables.min.css"/>
+<link rel="stylesheet" href="{{asset('css/jquery-confirm/jquery-confirm.css')}}" />
+<link rel="stylesheet" href="{{asset('css/jquery.dropdown.min.css')}}">
+{% endblock %}
+
+{% block body %}
+<div class="row">
+
+    <div class="content-box-large">
+        <div class="panel-heading">
+            <div class="panel-title">Liste des catégories enregitrées</div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">        
+                    <button type="button" class="btn btn-info pull-left" onclick="javascript:newCat();">
+                    <span class="glyphicon glyphicon-upload"></span> Ajouter une catégorie</button>
+                </div>
+                <div class="col-md-9">
+                </div> 
+            </div>
+            <br/><br/>
+
+            <div class="row">
+                <div id="categories">Chargement...</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block jscript %}
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.2.1/dt-1.10.16/datatables.min.js"></script>
+<script src="{{ asset('bundles/datatables/js/datatables.js') }}"></script>
+<!--modal jquery confirm-->
+<script type="text/javascript" src="{{asset('js/jquery-confirm/jquery-confirm.js')}}"></script>
+<script src="{{asset('js/jquery.dropdown.min.js')}}"></script>
+<script>
+    $(function() {
+        table2 = $('#categories').initDataTables({{ datatable_settings(datatable) }} , {
+            "pageLength": 10,
+            /*doc pour le 'affichage https://datatables.net/examples/basic_init/dom.html */
+            dom: '<"top"lf>rt<"bottom"ip><"clear">',
+            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tous"]],
+            "searching": true,
+            columnDefs: [
+                {width: "80%", targets: 0},
+                {width: "20%", targets: 1}
+            ],initComplete: function(){
+                //
+            },//fin inicomplete
+            drawCallback: function( settings ) {
+                //check ou uncheck des checkbox dans la liste
+                
+            }//fin drawcallback
+        });//fin datatables
+
+    });//fin function
+</script>
+
+<script>
+/*les fonctions*/
+function newCat()
+{
+    //creation du popup filtre
+    popupnewDoc = $.confirm({
+        title: "Ajouter une catégorie",
+        closeIcon: true,
+        type: 'purple',
+        columnClass: 'm',
+        content: function () {
+            var self = this;
+            return $.ajax({
+                url: "{{ path('ajout_categorie') }}",
+                data: {appel : 'global'},
+                dataType: 'html',
+                type: 'POST'
+            }).done(function (response) {
+                self.setContent(response);
+            }).fail(function(error){
+                if(error.status == 440) // redirect to accueil (deconnect
+                {
+                    //redirectDeconnect();
+                } 
+                self.close();
+            });
+        },
+        buttons: {
+            Appliquer: {
+                text: "Enregistrer",
+                btnClass: 'btn-blue',
+                action: function () {
+                    saveCat();
+                    this.close();
+                }
+            },
+            fermer: {
+                text: "Fermer",
+                btnClass: 'btn-blue',
+                action: function () {
+                    this.close();
+                }
+            }
+        }//fin button
+    });//fin confirm
+
+}//fin newdoc
+
+function savedoc()
+{
+    $.ajax({
+        type: 'POST',
+        url: '{{ path('save_doc') }}',
+        dataType: 'html',
+        data: new FormData($('#ajoutdoc')[0]),
+        dataType: 'json',
+        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+        processData: false, // NEEDED, DON'T OMIT THIS
+        success: function (response) {
+            $.alert({
+                title: response.msg,
+                type : response.type,
+                content: '',
+            });
+            table2.then(function(dt) {
+                // dt contains the initialized instance of DataTables
+                dt.ajax.reload();
+            });
+        }//fin success
+    });//fin ajax
+}//fin savedoc
+
+//
+function editDoc(idDoc)
+{
+    //creation du popup filtre
+    popupeditDoc = $.confirm({
+        title: "Détails du document",
+        closeIcon: true,
+        type: 'purple',
+        columnClass: 'l',
+        content: function () {
+            var self = this;
+            return $.ajax({
+                url: "{{ path('edit_doc') }}",
+                data: {id : idDoc},
+                dataType: 'html',
+                type: 'POST'
+            }).done(function (response) {
+                self.setContent(response);
+            }).fail(function(error){
+                if(error.status == 440) // redirect to accueil (deconnect
+                {
+                    //redirectDeconnect();
+                } 
+                self.close();
+            });
+        },
+        buttons: {
+            Appliquer: {
+                text: "Mettre à jour",
+                btnClass: 'btn-blue',
+                action: function () {
+                    saveeditdoc();
+                    this.close();
+                }
+            },
+            fermer: {
+                text: "Fermer",
+                btnClass: 'btn-blue',
+                action: function () {
+                    this.close();
+                }
+            }
+        }//fin button
+    });//fin confirm
+
+}//fin newdoc
+
+function saveeditdoc()
+{
+    $.ajax({
+        type: 'POST',
+        url: '{{ path('save_edit_doc') }}',
+        dataType: 'html',
+        data: new FormData($('#editdoc')[0]),
+        dataType: 'json',
+        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+        processData: false, // NEEDED, DON'T OMIT THIS
+        success: function (response) {
+            $.alert({
+                title: response.msg,
+                type : response.type,
+                content: '',
+            });
+            table2.then(function(dt) {
+                // dt contains the initialized instance of DataTables
+                dt.ajax.reload();
+            });
+        }//fin success
+    });//fin ajax
+}//fin savedoc
+
+function deleteDoc(idDoc,titre)
+{
+    //creation du popup filtre
+    popupdeleteDoc = $.confirm({
+        title: "Suppression du document",
+        closeIcon: true,
+        type: 'red',
+        columnClass: 'm',
+        content: "Etes-vous sûr de vouloir supprimer le document : <b>\""+titre+"\"</b> du serveur ? "
+        + "<br/> <b>Attention</b> cette action est irréversible",
+        buttons: {
+            Appliquer: {
+                text: "Oui, je suis sûr",
+                btnClass: 'btn-blue',
+                action: function () {
+                    savedeletedoc(idDoc);
+                    this.close();
+                }
+            },
+            fermer: {
+                text: "Abandonner",
+                btnClass: 'btn-blue',
+                action: function () {
+                    this.close();
+                }
+            }
+        }//fin button
+    });//fin confirm
+}//fin delete doc
+
+function savedeletedoc(idDoc)
+{
+    $.ajax({
+        type: 'POST',
+        url: '{{ path('save_delete_doc') }}',
+        data: { ident : idDoc },
+        dataType: 'json',
+        success: function (response) {
+            $.alert({
+                title: response.msg,
+                type : response.type,
+                content: '',
+            });
+            table2.then(function(dt) {
+                // dt contains the initialized instance of DataTables
+                dt.ajax.reload();
+            });
+        }//fin success
+    });//fin ajax
+}//fin savedeletedoc
+
+</script>
+{% endblock %}
+

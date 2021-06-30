@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 //datatables
@@ -48,7 +49,10 @@ class DocumentController extends AbstractController
     {
         //definition des colonnes du datatable
         $table = $dataTableFactory->create()
-            ->add('fichier', TextColumn::class, ['field' => 'doc.docName','className' => 'text-left','searchable' => true,'globalSearchable' => true, 'label' => 'Nom du fichier'])
+            ->add('fichier', TextColumn::class, ['field' => 'doc.docName','className' => 'text-left','searchable' => true,'globalSearchable' => true, 
+            'label' => 'Nom du fichier', 'render' => function($value, $context) use ($Request) {
+                return "<a href='".$Request->getSchemeAndHttpHost()."/docs/download/".$value."' target='_blank'>".$value."</a>";
+            }])
             ->add('categorie', TextColumn::class, ['field' => 'doc.docId','className' => 'text-left','searchable' => true, 'label' => 'Catégories' , 'render' => function($value, $context) use ($service) {
                 return $service->renderDocCategories($value);
             }])
@@ -357,5 +361,28 @@ class DocumentController extends AbstractController
         
         }//fin xmlhttprequest
     }//fin editenregdoc
+
+    /**
+     * @Route("/docs/download/{filename}", name="download_doc")
+     */
+    public function downloadDocs($filename, SessionInterface $session, Request $Request, KernelInterface $kernel)
+    {
+        $path = $kernel->getProjectDir()."\public\upload\\$filename";
+        $content = file_get_contents($path);
+    
+        //set headers
+        // Teste si c'est une PDF
+        if(strpos($filename, '.pdf') !== false){
+            $response = new BinaryFileResponse($path);
+            $response->headers->set('Content-Type', 'application/pdf');
+        } else{
+            $response = new Response();
+            $response->headers->set('Content-Type', 'mime/type');
+            $response->headers->set('Content-Disposition', 'attachment;filename="'.$filename);
+            $response->setContent($content);
+        }
+        return $response;
+    }//fin download doc
+    
 
 }//fin doc controler
