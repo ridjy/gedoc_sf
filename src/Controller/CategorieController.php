@@ -106,4 +106,37 @@ class CategorieController extends AbstractController
         }
     }//fin ajoutdoc
 
+    /**
+     * @Route("/cats/ajout/enreg", name="save_cat")
+     */
+    public function enregCats(SessionInterface $session, Request $Request, KernelInterface $kernel)
+    {
+        //on n'affiche rien si ce n'est pas un appel ajax
+        if ($Request->isXmlHttpRequest()) 
+        {
+            $s_categorie = $Request->request->get('cat');
+
+            //test si categorie existe deja
+            $o_catExist = $this->getDoctrine()->getRepository(Categories::class)->findOneBy(array('catLibelle' => $s_categorie));
+            $entityManager = $this->getDoctrine()->getManager();
+            if ($o_catExist) {
+                $result = array('msg' => 'Catégorie déjà existante', 'type'=>'red');
+            } else {
+                //creation des objets à mettre en base
+                $o_categorie = new Categories();
+                $o_categorie->setCatLibelle($s_categorie);
+                $entityManager->persist($o_categorie);
+                $entityManager->flush();
+                $result = array('msg' => 'Catégorie enregistrée', 'type'=>'green');
+            }
+            $response = json_encode($result);
+            $returnResponse = new JsonResponse();
+            $returnResponse->setJson($response);
+
+            return $returnResponse;
+        
+        }//fin xmlhttprequest
+    }//fin enregCats
+
+
 }//fin categorie controller

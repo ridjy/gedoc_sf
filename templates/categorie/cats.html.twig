@@ -112,16 +112,15 @@ function newCat()
 
 }//fin newdoc
 
-function savedoc()
+function saveCat()
 {
+    var newcat=$('#categorie').val();
     $.ajax({
         type: 'POST',
-        url: '{{ path('save_doc') }}',
+        url: '{{ path('save_cat') }}',
         dataType: 'html',
-        data: new FormData($('#ajoutdoc')[0]),
+        data: { cat : newcat },
         dataType: 'json',
-        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-        processData: false, // NEEDED, DON'T OMIT THIS
         success: function (response) {
             $.alert({
                 title: response.msg,
