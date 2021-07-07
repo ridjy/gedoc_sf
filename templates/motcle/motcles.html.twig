@@ -70,14 +70,14 @@ function newMc()
 {
     //creation du popup filtre
     popupnewDoc = $.confirm({
-        title: "Ajouter une Motcle",
+        title: "Ajouter un mot clé",
         closeIcon: true,
         type: 'purple',
         columnClass: 'm',
         content: function () {
             var self = this;
             return $.ajax({
-                url: "{{ path('ajout_Mcegorie') }}",
+                url: "{{ path('ajout_motcle') }}",
                 data: {appel : 'global'},
                 dataType: 'html',
                 type: 'POST'
@@ -114,10 +114,10 @@ function newMc()
 
 function saveMc()
 {
-    var newMc=$('#Mcegorie').val();
+    var newMc=$('#mc').val();
     $.ajax({
         type: 'POST',
-        url: '{{ path('save_Mc') }}',
+        url: "{{ path('save_motcle') }}",
         dataType: 'html',
         data: { Mc : newMc },
         dataType: 'json',
@@ -140,14 +140,14 @@ function editMc(idMc)
 {
     //creation du popup filtre
     popupeditMc = $.confirm({
-        title: "Détails de la Motcle",
+        title: "Détails du mot clé",
         closeIcon: true,
         type: 'purple',
         columnClass: 'l',
         content: function () {
             var self = this;
             return $.ajax({
-                url: "{{ path('edit_Mc') }}",
+                url: "{{ path('edit_motcle') }}",
                 data: {id : idMc},
                 dataType: 'html',
                 type: 'POST'
@@ -184,11 +184,11 @@ function editMc(idMc)
 
 function saveeditMc()
 {
-    var idMc=$('#id_Mc').val();
-    var newMcs = $('#Mcegorie').val();
+    var idMc=$('#id_mc').val();
+    var newMcs = $('#mc').val();
     $.ajax({
         type: 'POST',
-        url: '{{ path('save_edit_Mc') }}',
+        url: "{{ path('save_edit_motcle') }}",
         dataType: 'html',
         data: { id : idMc, new : newMcs },
         dataType: 'json',
@@ -210,12 +210,11 @@ function deleteMc(idMc,titre)
 {
     //creation du popup filtre
     popupdeleteMc = $.confirm({
-        title: "Suppression de la Motcle",
+        title: "Suppression du mot cle",
         closeIcon: true,
         type: 'red',
         columnClass: 'm',
-        content: "Etes-vous sûr de vouloir supprimer la Motcle : <b>\""+titre+"\"</b> ? "
-        + "<br/> Certains documents pourraient ne plus avoir de Motcle."
+        content: "Etes-vous sûr de vouloir supprimer le mot clé : <b>\""+titre+"\"</b> ? "
         + "<br/> <b>Attention</b> cette action est irréversible",
         buttons: {
             Appliquer: {
@@ -241,7 +240,7 @@ function savedeleteMc(idMc)
 {
     $.ajax({
         type: 'POST',
-        url: '{{ path('save_delete_Mc') }}',
+        url: "{{ path('save_delete_motcle') }}",
         data: { ident : idMc },
         dataType: 'json',
         success: function (response) {

@@ -19,7 +19,7 @@ use App\Entity\Users;
 use App\Entity\Documents;
 use App\Entity\Motcles;
 use App\Entity\DocMotcle;
-use App\Entity\Notifimotcleions;
+use App\Entity\Notifications;
 //service
 use App\Service\DocService;
 //kernel
@@ -39,8 +39,8 @@ class MotcleController extends AbstractController
             ->add('action', TextColumn::class, [
                 'field' => 'motcle.mcId', 'label' => 'Action', 'orderable' => false,
                 'className' => 'text-center', 'render' => function ($value, $context) use ($session) {
-                    $s_modif = '<span style="font-size: 20px;" class="glyphicon glyphicon-pencil" onClick="editmotcle('.$value.');"></span>  ';
-                    $s_effacer = '<span style="font-size: 20px;" class="glyphicon glyphicon-trash" onClick="deletemotcle('.$value.',\''.$context->getMcLib().'\');"></span>  ';
+                    $s_modif = '<span style="font-size: 20px;" class="glyphicon glyphicon-pencil" onClick="editMc('.$value.');"></span>  ';
+                    $s_effacer = '<span style="font-size: 20px;" class="glyphicon glyphicon-trash" onClick="deleteMc('.$value.',\''.$context->getMcLib().'\');"></span>  ';
                     $responseTemp = "<table><tr style='background-color:transparent'><td style='width :50%; padding: 5px' >".$s_modif .
                      "</td><td style='width :50%; padding: 5px'>" . $s_effacer . "</td></tr>";
                     return $responseTemp;
@@ -84,7 +84,7 @@ class MotcleController extends AbstractController
         }
 
         return $this->render('motcle/motcles.html.twig', [
-            'nav' => 'liste_motcle',
+            'nav' => 'motcle',
             'datatable' => $table
         ]);
     }//fin index
@@ -111,20 +111,20 @@ class MotcleController extends AbstractController
         //on n'affiche rien si ce n'est pas un appel ajax
         if ($Request->isXmlHttpRequest()) 
         {
-            $s_motcle = $Request->request->get('motcle');
+            $s_motcle = $Request->request->get('Mc');
 
             //test si motcle existe deja
-            $o_motcleExist = $this->getDoctrine()->getRepository(motcles::class)->findOneBy(array('motcleLibelle' => $s_motcle));
+            $o_motcleExist = $this->getDoctrine()->getRepository(Motcles::class)->findOneBy(array('mcLib' => $s_motcle));
             $entityManager = $this->getDoctrine()->getManager();
             if ($o_motcleExist) {
-                $result = array('msg' => 'motcleégorie déjà existante', 'type'=>'red');
+                $result = array('msg' => 'Mot clé déjà existant', 'type'=>'red');
             } else {
                 //creation des objets à mettre en base
                 $o_motcle = new motcles();
-                $o_motcle->setmotcleLibelle($s_motcle);
+                $o_motcle->setMcLib($s_motcle);
                 $entityManager->persist($o_motcle);
                 $entityManager->flush();
-                $result = array('msg' => 'motcleégorie enregistrée', 'type'=>'green');
+                $result = array('msg' => 'Mot clé enregistré', 'type'=>'green');
             }
             $response = json_encode($result);
             $returnResponse = new JsonResponse();
@@ -144,7 +144,7 @@ class MotcleController extends AbstractController
         if ($Request->isXmlHttpRequest()) 
         {
             $n_idmotcle = $Request->request->get('id');
-            $o_motcle = $this->getDoctrine()->getRepository(motcles::class)->find($n_idmotcle);
+            $o_motcle = $this->getDoctrine()->getRepository(Motcles::class)->find($n_idmotcle);
         
             return $this->render('motcle/edit.html.twig', [
                 'motcle' => $o_motcle
@@ -163,14 +163,14 @@ class MotcleController extends AbstractController
             $n_idmotcle = $Request->request->get('id');
             $s_motcle = $Request->request->get('new');
             $entityManager = $this->getDoctrine()->getManager();
-            $o_motcle = $this->getDoctrine()->getRepository(motcles::class)->find($n_idmotcle);
+            $o_motcle = $this->getDoctrine()->getRepository(Motcles::class)->find($n_idmotcle);
             //document
-            $o_motcle->setmotcleLibelle($s_motcle);
+            $o_motcle->setMcLib($s_motcle);
             $entityManager->persist($o_motcle);
             $entityManager->flush();
             
             //formattage msg retour
-            $result = array('msg' => 'motcleégorie mise à jour', 'type'=>'green');
+            $result = array('msg' => 'Mot clé mise à jour', 'type'=>'green');
 		    
             $response = json_encode($result);
             $returnResponse = new JsonResponse();
@@ -192,16 +192,16 @@ class MotcleController extends AbstractController
         {
             $n_idmotcle = $Request->request->get('ident');
             $entityManager = $this->getDoctrine()->getManager();
-            $o_motcle = $this->getDoctrine()->getRepository(motcles::class)->find($n_idmotcle);
+            $o_motcle = $this->getDoctrine()->getRepository(Motcles::class)->find($n_idmotcle);
             
-            $s_titre = $o_motcle->getmotcleLibelle();
+            $s_titre = $o_motcle->getMcLib();
             $entityManager->remove($o_motcle);
             $entityManager->flush();
             
             //ajout notifimotcleion
-            $o_notif = new Notifimotcleions();
+            $o_notif = new Notifications();
             $o_notif->setDateNotif(date('d/m/Y H:i:s'));
-            $o_notif->setContenu('Suppression de la motcleégorie'.$s_titre);
+            $o_notif->setContenu('Suppression du mot cle'.$s_titre);
             $o_notif->setLu(0);
             $entityManager->persist($o_notif);
             $entityManager->flush();
