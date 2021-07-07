@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 //datatables
@@ -19,31 +18,29 @@ use Omines\DataTablesBundle\Adapter\Doctrine\ORM\SearchCriteriaProvider;
 use App\Entity\Users;
 use App\Entity\Documents;
 use App\Entity\Motcles;
-use App\Entity\Categories;
-use App\Entity\DocCategorie;
 use App\Entity\DocMotcle;
-use App\Entity\Notifications;
+use App\Entity\Notifimotcleions;
 //service
 use App\Service\DocService;
 //kernel
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class CategorieController extends AbstractController
+class MotcleController extends AbstractController
 {
     /**
-     * @Route("/categorie/liste", name="categorie_liste")
+     * @Route("/motcle/liste", name="motcle_liste")
      */
-    public function categorie(SessionInterface $session, Request $Request, DataTableFactory $dataTableFactory, DocService $service): Response
+    public function motcle(SessionInterface $session, Request $Request, DataTableFactory $dataTableFactory, DocService $service): Response
     {
         //definition des colonnes du datatable
         $table = $dataTableFactory->create()
-            ->add('categorie', TextColumn::class, ['field' => 'cat.catLibelle','className' => 'text-left','searchable' => true,'globalSearchable' => true, 
-            'label' => 'Catégories'])
+            ->add('motcle', TextColumn::class, ['field' => 'motcle.mcLib','className' => 'text-left','searchable' => true,'globalSearchable' => true, 
+            'label' => 'Mot clé'])
             ->add('action', TextColumn::class, [
-                'field' => 'cat.catId', 'label' => 'Action', 'orderable' => false,
+                'field' => 'motcle.mcId', 'label' => 'Action', 'orderable' => false,
                 'className' => 'text-center', 'render' => function ($value, $context) use ($session) {
-                    $s_modif = '<span style="font-size: 20px;" class="glyphicon glyphicon-pencil" onClick="editCat('.$value.');"></span>  ';
-                    $s_effacer = '<span style="font-size: 20px;" class="glyphicon glyphicon-trash" onClick="deleteCat('.$value.',\''.$context->getCatLibelle().'\');"></span>  ';
+                    $s_modif = '<span style="font-size: 20px;" class="glyphicon glyphicon-pencil" onClick="editmotcle('.$value.');"></span>  ';
+                    $s_effacer = '<span style="font-size: 20px;" class="glyphicon glyphicon-trash" onClick="deletemotcle('.$value.',\''.$context->getMcLib().'\');"></span>  ';
                     $responseTemp = "<table><tr style='background-color:transparent'><td style='width :50%; padding: 5px' >".$s_modif .
                      "</td><td style='width :50%; padding: 5px'>" . $s_effacer . "</td></tr>";
                     return $responseTemp;
@@ -51,13 +48,13 @@ class CategorieController extends AbstractController
             ])
 
             ->createAdapter(OrmAdapter::class, [
-                'entity' => Categories::class,
+                'entity' => Motcles::class,
                 'query' => function (\Doctrine\ORM\QueryBuilder $builder) use ($session) {
                     $builder
-                        ->select('cat')
+                        ->select('motcle')
                         //selection de l'entité jointe
                         //->addSelect('centre')
-                        ->from(Categories::class, 'cat')
+                        ->from(Motcles::class, 'motcle')
                         //1er arg : attribut de jointure, 2e arg : alias de l'entité jointe
                         //->leftJoin('dic.idConcerne', 'patient')
                         //pour filtre ville centre    
@@ -86,48 +83,48 @@ class CategorieController extends AbstractController
             return $table->getResponse();
         }
 
-        return $this->render('categorie/cats.html.twig', [
-            'nav' => 'liste_cat',
+        return $this->render('motcle/motcles.html.twig', [
+            'nav' => 'liste_motcle',
             'datatable' => $table
         ]);
     }//fin index
 
     /**
-     * @Route("/categorie/ajout", name="ajout_categorie")
+     * @Route("/motcle/ajout", name="ajout_motcle")
      */
-    public function ajoutCats(SessionInterface $session, Request $Request)
+    public function ajoutmotcles(SessionInterface $session, Request $Request)
     {
         //on n'affiche rien si ce n'est pas un appel ajax
         if ($Request->isXmlHttpRequest()) 
         {
-            return $this->render('categorie/ajout.html.twig', [
-                'categories' => 'add'
+            return $this->render('motcle/ajout.html.twig', [
+                'motcles' => 'add'
             ]);
         }
     }//fin ajoutdoc
 
     /**
-     * @Route("/cats/ajout/enreg", name="save_cat")
+     * @Route("/motcles/ajout/enreg", name="save_motcle")
      */
-    public function enregCats(SessionInterface $session, Request $Request, KernelInterface $kernel)
+    public function enregmotcles(SessionInterface $session, Request $Request, KernelInterface $kernel)
     {
         //on n'affiche rien si ce n'est pas un appel ajax
         if ($Request->isXmlHttpRequest()) 
         {
-            $s_categorie = $Request->request->get('cat');
+            $s_motcle = $Request->request->get('motcle');
 
-            //test si categorie existe deja
-            $o_catExist = $this->getDoctrine()->getRepository(Categories::class)->findOneBy(array('catLibelle' => $s_categorie));
+            //test si motcle existe deja
+            $o_motcleExist = $this->getDoctrine()->getRepository(motcles::class)->findOneBy(array('motcleLibelle' => $s_motcle));
             $entityManager = $this->getDoctrine()->getManager();
-            if ($o_catExist) {
-                $result = array('msg' => 'Catégorie déjà existante', 'type'=>'red');
+            if ($o_motcleExist) {
+                $result = array('msg' => 'motcleégorie déjà existante', 'type'=>'red');
             } else {
                 //creation des objets à mettre en base
-                $o_categorie = new Categories();
-                $o_categorie->setCatLibelle($s_categorie);
-                $entityManager->persist($o_categorie);
+                $o_motcle = new motcles();
+                $o_motcle->setmotcleLibelle($s_motcle);
+                $entityManager->persist($o_motcle);
                 $entityManager->flush();
-                $result = array('msg' => 'Catégorie enregistrée', 'type'=>'green');
+                $result = array('msg' => 'motcleégorie enregistrée', 'type'=>'green');
             }
             $response = json_encode($result);
             $returnResponse = new JsonResponse();
@@ -136,44 +133,44 @@ class CategorieController extends AbstractController
             return $returnResponse;
         
         }//fin xmlhttprequest
-    }//fin enregCats
+    }//fin enregmotcles
 
     /**
-     * @Route("/cats/edit", name="edit_cat")
+     * @Route("/motcles/edit", name="edit_motcle")
      */
-    public function modifierCats(SessionInterface $session, Request $Request)
+    public function modifiermotcles(SessionInterface $session, Request $Request)
     {
         //on n'affiche rien si ce n'est pas un appel ajax
         if ($Request->isXmlHttpRequest()) 
         {
-            $n_idcat = $Request->request->get('id');
-            $o_categorie = $this->getDoctrine()->getRepository(Categories::class)->find($n_idcat);
+            $n_idmotcle = $Request->request->get('id');
+            $o_motcle = $this->getDoctrine()->getRepository(motcles::class)->find($n_idmotcle);
         
-            return $this->render('categorie/edit.html.twig', [
-                'cat' => $o_categorie
+            return $this->render('motcle/edit.html.twig', [
+                'motcle' => $o_motcle
             ]);
         }//fin if
     }//fin modifierDocs
 
     /**
-     * @Route("/categorie/edit/enreg", name="save_edit_cat")
+     * @Route("/motcle/edit/enreg", name="save_edit_motcle")
      */
-    public function editenregCats(SessionInterface $session, Request $Request, KernelInterface $kernel)
+    public function editenregmotcles(SessionInterface $session, Request $Request, KernelInterface $kernel)
     {
         //on n'affiche rien si ce n'est pas un appel ajax
         if ($Request->isXmlHttpRequest()) 
         {
-            $n_idCat = $Request->request->get('id');
-            $s_categorie = $Request->request->get('new');
+            $n_idmotcle = $Request->request->get('id');
+            $s_motcle = $Request->request->get('new');
             $entityManager = $this->getDoctrine()->getManager();
-            $o_cat = $this->getDoctrine()->getRepository(Categories::class)->find($n_idCat);
+            $o_motcle = $this->getDoctrine()->getRepository(motcles::class)->find($n_idmotcle);
             //document
-            $o_cat->setCatLibelle($s_categorie);
-            $entityManager->persist($o_cat);
+            $o_motcle->setmotcleLibelle($s_motcle);
+            $entityManager->persist($o_motcle);
             $entityManager->flush();
             
             //formattage msg retour
-            $result = array('msg' => 'Catégorie mise à jour', 'type'=>'green');
+            $result = array('msg' => 'motcleégorie mise à jour', 'type'=>'green');
 		    
             $response = json_encode($result);
             $returnResponse = new JsonResponse();
@@ -182,29 +179,29 @@ class CategorieController extends AbstractController
             return $returnResponse;
         
         }//fin xmlhttprequest
-    }//fin editenregcat
+    }//fin editenregmotcle
 
 
     /**
-     * @Route("/cats/delete/enreg", name="save_delete_cat")
+     * @Route("/motcles/delete/enreg", name="save_delete_motcle")
      */
-    public function deleteenregCats(SessionInterface $session, Request $Request, KernelInterface $kernel)
+    public function deleteenregmotcles(SessionInterface $session, Request $Request, KernelInterface $kernel)
     {
         //on n'affiche rien si ce n'est pas un appel ajax
         if ($Request->isXmlHttpRequest()) 
         {
-            $n_idCat = $Request->request->get('ident');
+            $n_idmotcle = $Request->request->get('ident');
             $entityManager = $this->getDoctrine()->getManager();
-            $o_cat = $this->getDoctrine()->getRepository(Categories::class)->find($n_idCat);
+            $o_motcle = $this->getDoctrine()->getRepository(motcles::class)->find($n_idmotcle);
             
-            $s_titre = $o_cat->getCatLibelle();
-            $entityManager->remove($o_cat);
+            $s_titre = $o_motcle->getmotcleLibelle();
+            $entityManager->remove($o_motcle);
             $entityManager->flush();
             
-            //ajout notification
-            $o_notif = new Notifications();
+            //ajout notifimotcleion
+            $o_notif = new Notifimotcleions();
             $o_notif->setDateNotif(date('d/m/Y H:i:s'));
-            $o_notif->setContenu('Suppression de la catégorie'.$s_titre);
+            $o_notif->setContenu('Suppression de la motcleégorie'.$s_titre);
             $o_notif->setLu(0);
             $entityManager->persist($o_notif);
             $entityManager->flush();
@@ -221,4 +218,4 @@ class CategorieController extends AbstractController
         }//fin xmlhttprequest
     }//fin editenregdoc
 
-}//fin categorie controller
+}//fin motcle controller
