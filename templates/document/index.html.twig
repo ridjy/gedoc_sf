@@ -37,7 +37,41 @@
 				    </table>
 		  		</div><!--fin panel body-->
 		  	</div>
-  	    </div><!--fin content box-->
+  	</div><!--fin col 6-->
+
+    <div class="col-md-6">
+  		<div class="content-box-large">
+		  	<div class="panel-heading">
+				<div class="panel-title">Dernières actualités</div>
+							
+                    <div class="panel-options">
+                        <a href="#" data-rel="collapse"><i class="glyphicon glyphicon-refresh"></i></a>
+                        <!--<a href="#" data-rel="reload"><i class="glyphicon glyphicon-cog"></i></a>
+                        -->
+                    </div>
+                </div><!--fin title-->  
+		  	<div class="panel-body">
+		  			<table class="table">
+				        <thead>
+                            <tr>
+                                <th>Date et heure</th>
+                                <th>Notification</th>
+                            </tr>
+                        </thead>
+				        <tbody>
+                            {% for n in notif %}
+				            <tr class="warning">
+                                <td>{{ n.dateNotif }}</td>
+                                <td>{{ n.contenu }}</td>
+                            </tr>
+				            {% endfor %}    
+				        </tbody>
+				    </table>
+		  		</div><!--fin panel body-->
+            </div>      
+		  	</div><!--fin content box-->
     </div><!--fin col md 6-->
-</div>
+
+</div><!--fin row-->
+
 {% endblock %}
