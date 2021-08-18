@@ -53,4 +53,14 @@ class LoginController extends AbstractController
         
     }//end connexion
 
+    /**
+     * @Route("/deconnect", name="users_deconnect")
+     */
+    public function deconnexion(Request $request,SessionInterface $session): Response
+    {
+        $session->set('user_connecte', NULL);
+        unset($session);
+        return $this->redirectToRoute('login');
+    }//end deconnect
+
 }//end loginController
