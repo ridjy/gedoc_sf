@@ -15,10 +15,14 @@ class RequestSubscriber implements EventSubscriberInterface
     {
         $request = $event->getRequest();
         $uri = $_SERVER['REQUEST_URI'];
-        if ($request->getSession()->get('user_connecte') == NULL && $uri!='/')
+        
+        if ($request->getSession()->get('user_connecte') === null && $uri!='/' && $uri!='/connexion?form=2')
         {
             $event->setResponse(new RedirectResponse('/'));    
+        } else if ($request->getSession()->get('user_connecte') !== null && ($uri=='/' || $uri=='/connexion?form=2')) {
+            $event->setResponse(new RedirectResponse('/docs'));
         }//endif
+
         //redirect si pas de user connecte
     }
 

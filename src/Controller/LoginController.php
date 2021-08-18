@@ -48,7 +48,7 @@ class LoginController extends AbstractController
             $response = $this->forward('App\Controller\DocumentController::index', [
                 'login'  => $s_email
             ]);
-        }    
+        }
         return $response;
         
     }//end connexion
@@ -58,8 +58,7 @@ class LoginController extends AbstractController
      */
     public function deconnexion(Request $request,SessionInterface $session): Response
     {
-        $session->set('user_connecte', NULL);
-        unset($session);
+        $session->clear();
         return $this->redirectToRoute('login');
     }//end deconnect
 
