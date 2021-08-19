@@ -16,7 +16,7 @@ class RequestSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $uri = $_SERVER['REQUEST_URI'];
         
-        if ($request->getSession()->get('user_connecte') === null && $uri!='/' && $uri!='/connexion?form=2')
+        if ($request->getSession()->get('user_connecte') === null && $uri!='/' && $uri!='/connexion?form=2' && $uri!='/signup')
         {
             $event->setResponse(new RedirectResponse('/'));    
         } else if ($request->getSession()->get('user_connecte') !== null && ($uri=='/' || $uri=='/connexion?form=2')) {
