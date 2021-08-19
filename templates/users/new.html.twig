@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Users{% endblock %}
+
+{% block body %}
+<div class="row">    
+    <div class="col-md-2">
+        <a href="{{ path('users_index') }}"><button class="btn btn-warning" type="button">Retour</button></a>
+    </div>
+</div> <br/>
+<div class="row">    
+    <div class="col-md-8">
+        <div class="content-box-large">
+        <div class="panel-heading">
+            <div class="panel-title">Ajouter un collaborateur</div>			
+                <div class="panel-options">
+                    <a href="#" data-rel="collapse"><i class="glyphicon glyphicon-refresh"></i></a>
+                    <!--<a href="#" data-rel="reload"><i class="glyphicon glyphicon-cog"></i></a>
+                    -->
+                </div>
+            </div><!--fin title-->
+
+            <div class="panel-body">
+                {{ include('users/_form.html.twig') }}
+            </div>    
+
+        </div>
+        </div>    
+    </div><!--end div-->
+</div><!--end div row--> 
+
+{% endblock %}

@@ -201,7 +201,7 @@ class MotcleController extends AbstractController
             //ajout notifimotcleion
             $o_notif = new Notifications();
             $o_notif->setDateNotif(date('d/m/Y H:i:s'));
-            $o_notif->setContenu('Suppression du mot cle'.$s_titre);
+            $o_notif->setContenu('Suppression du mot cle : '.$s_titre);
             $o_notif->setLu(0);
             $entityManager->persist($o_notif);
             $entityManager->flush();

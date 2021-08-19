@@ -204,7 +204,7 @@ class CategorieController extends AbstractController
             //ajout notification
             $o_notif = new Notifications();
             $o_notif->setDateNotif(date('d/m/Y H:i:s'));
-            $o_notif->setContenu('Suppression de la catégorie'.$s_titre);
+            $o_notif->setContenu('Suppression de la catégorie : '.$s_titre);
             $o_notif->setLu(0);
             $entityManager->persist($o_notif);
             $entityManager->flush();

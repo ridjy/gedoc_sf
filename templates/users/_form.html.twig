@@ -1,0 +1,31 @@
+{{ form_start(form) }}
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Nom</label>
+        <div class="col-sm-9">
+            {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <br/><br/><br/>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Prenom</label>
+        <div class="col-sm-9">
+            {{ form_widget(form.firstname, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <br/><br/>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Mot de passe</label>
+        <div class="col-sm-9">
+            {{ form_widget(form.password, {'attr': {'class': 'form-control', 'type': 'password'}}) }}
+        </div>
+    </div>
+    <br/><br/>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Email</label>
+        <div class="col-sm-9">
+            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <br/><br/>   
+    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}

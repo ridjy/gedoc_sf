@@ -48,9 +48,18 @@ class LoginController extends AbstractController
             $response = $this->forward('App\Controller\DocumentController::index', [
                 'login'  => $s_email
             ]);
-        }    
+        }
         return $response;
         
     }//end connexion
+
+    /**
+     * @Route("/deconnect", name="users_deconnect")
+     */
+    public function deconnexion(Request $request,SessionInterface $session): Response
+    {
+        $session->clear();
+        return $this->redirectToRoute('login');
+    }//end deconnect
 
 }//end loginController

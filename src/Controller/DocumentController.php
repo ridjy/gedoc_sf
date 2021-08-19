@@ -35,9 +35,11 @@ class DocumentController extends AbstractController
      */
     public function index(): Response
     {
-        $o_allUsers = $this->getDoctrine()->getRepository(Users::class)->findAll();    
+        $o_allUsers = $this->getDoctrine()->getRepository(Users::class)->findAll();
+        $o_5notifications = $this->getDoctrine()->getRepository(Notifications::class)->findfivelastNotif();    
         return $this->render('document/index.html.twig', [
             'alluser'  => $o_allUsers,
+            'notif'  => $o_5notifications,
             'nav' => 'dashboard'
         ]);
     }//fin index
