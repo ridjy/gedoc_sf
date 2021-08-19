@@ -37,16 +37,20 @@
                         </tr>
                     </tbody>
                 </table> 
-
-                <a href="{{ path('users_edit', {'usersId': user.usersId}) }}">edit</a>
-
-                {{ include('users/_delete_form.html.twig') }}               
-
             </div><!--fin panel body-->    
-
         </div>
-        </div>    
-    </div><!--end div-->
+        </div> 
+
+        <div class="col-md-3">
+            <a href="{{ path('users_edit', {'usersId': user.usersId}) }}">
+                <button class="btn btn-primary">Modifier</button>
+            </a><br/><br/>   
+            {{ include('users/_delete_form.html.twig') }}
+        </div> 
+
+    </div><!--end div col-->
+
+       
 </div><!--end div row-->
 
     
