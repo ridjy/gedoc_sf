@@ -25,6 +25,10 @@ class Product
             return $this->price * 0.055;
         }
 
+        if ($this->price < 0) {
+            throw new \LogicException('The TVA cannot be negative.');
+        }
+
         return $this->price * 0.196;
     }
 }
